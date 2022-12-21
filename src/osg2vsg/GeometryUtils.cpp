@@ -290,7 +290,7 @@ namespace osg2vsg
         }
     };
 
-    vsg::ref_ptr<vsg::Command> convertToVsg(osg::Geometry* ingeometry, uint32_t requiredAttributesMask, GeometryTarget geometryTarget)
+    vsg::ref_ptr<vsg::Command> convertToVsg(osg::Geometry* ingeometry, uint32_t requiredAttributesMask, GeometryTarget geometryTarget, VkPrimitiveTopology &topology)
     {
         uint32_t instanceCount = 1;
 
@@ -368,15 +368,18 @@ namespace osg2vsg
         if (collectPrimitives.points.size()>0)
         {
             std::cout<<"Warning: points not yet supported by vsgXchange/OSG loader."<<std::endl;
+            topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
         }
 
         if (collectPrimitives.lines.size()>0)
         {
             std::cout<<"Warning: lines not yet supported by vsgXchange/OSG loader."<<std::endl;
+            topology = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
         }
 #endif
         auto& triangles = collectPrimitives.triangles;
         auto& quads = collectPrimitives.quads;
+        topology = VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
 
         for (size_t i = 0; i < quads.size(); i += 4)
         {

@@ -632,7 +632,9 @@ vsg::ref_ptr<vsg::Node> SceneBuilder::createTransformGeometryGraphVSG(TransformG
             }
             else
             {
-                leaf = convertToVsg(geometry, requiredGeomAttributesMask, buildOptions->geometryTarget);
+                VkPrimitiveTopology topology;
+                // TODO haandle topology
+                leaf = convertToVsg(geometry, requiredGeomAttributesMask, buildOptions->geometryTarget, topology);
                 if (leaf)
                 {
                     geometriesMap[geometry] = leaf;

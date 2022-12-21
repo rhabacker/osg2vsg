@@ -204,7 +204,8 @@ void ConvertToVsg::apply(osg::Geometry& geometry)
 
     // std::cout<<"Have geometry with "<<statestack.size()<<" shaderModeMask="<<shaderModeMask<<", geometryMask="<<geometryMask<<std::endl;
 
-    auto vsg_geometry = osg2vsg::convertToVsg(&geometry, geometryMask, buildOptions->geometryTarget);
+    VkPrimitiveTopology topology;
+    auto vsg_geometry = osg2vsg::convertToVsg(&geometry, geometryMask, buildOptions->geometryTarget, topology);
     if (!vsg_geometry)
     {
         return;
@@ -215,6 +216,23 @@ void ConvertToVsg::apply(osg::Geometry& geometry)
     auto bindGraphicsPipeline = getOrCreateBindGraphicsPipeline(shaderModeMask, geometryMask);
     if (bindGraphicsPipeline)
     {
+        class SetInputAssemblyTopology : public vsg::Visitor
+        {
+        public:
+            VkPrimitiveTopology _topology;
+            SetInputAssemblyTopology(VkPrimitiveTopology topology) : _topology(topology) {}
+            void apply(vsg::InputAssemblyState& ias) override { ias.topology = _topology; }
+            void operator()(const vsg::GraphicsPipeline& gp)
+            {
+                for (auto& pipelineState : gp.pipelineStates)
+                {
+                    pipelineState->accept(*this);
+                }
+            }
+        };
+        SetInputAssemblyTopology visitor(topology);
+        visitor(*bindGraphicsPipeline->pipeline);
+
         if (!inheritedStateGroup || !inheritedStateGroup->contains(bindGraphicsPipeline))
         {
             stategroup->add(bindGraphicsPipeline);

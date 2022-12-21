@@ -63,6 +63,6 @@ namespace osg2vsg
 
     vsg::ref_ptr<vsg::materialValue> convertToMaterialValue(const osg::Material* material);
 
-    vsg::ref_ptr<vsg::Command> convertToVsg(osg::Geometry* geometry, uint32_t requiredAttributesMask, GeometryTarget geometryTarget);
+    vsg::ref_ptr<vsg::Command> convertToVsg(osg::Geometry* geometry, uint32_t requiredAttributesMask, GeometryTarget geometryTarget, VkPrimitiveTopology &topology);
 
 } // namespace osg2vsg
